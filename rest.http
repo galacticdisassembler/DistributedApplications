@@ -1,8 +1,11 @@
-GET http://localhost:8080/api
+GET http://localhost:8080/service
 
 
 
+GET http://localhost:8080/articles?q=1&q=22
+Content-Type: application/json
 
 
 
-
+GET http://localhost:8080/articles?q=1&q=22
+Content-Type: application/xml

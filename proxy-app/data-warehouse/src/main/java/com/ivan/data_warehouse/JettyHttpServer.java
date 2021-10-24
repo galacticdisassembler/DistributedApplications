@@ -1,5 +1,7 @@
 package com.ivan.data_warehouse;
 
+import com.ivan.data_warehouse.servlets.ArticlesAsyncServlet;
+import com.ivan.data_warehouse.servlets.ServiceMechanismServlet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.server.Connector;
@@ -17,10 +19,11 @@ public class JettyHttpServer {
         server = new Server();
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(port);
-        server.setConnectors(new Connector[] { connector });
+        server.setConnectors(new Connector[] {connector});
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
-        context.addServlet(AsyncServlet.class, "/");
+        context.addServlet(ArticlesAsyncServlet.class, "/articles");
+        context.addServlet(ServiceMechanismServlet.class, "/service");
         server.setHandler(context);
         logger.info("App is running on port: {}", port);
         server.start();
