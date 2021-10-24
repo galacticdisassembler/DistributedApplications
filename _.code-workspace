@@ -158,5 +158,31 @@
     "files.associations": {
       "*.jsp": "html"
     }
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "java",
+        "name": "Launch DataWarehouse instance1",
+        "request": "launch",
+        "mainClass": "com.ivan.data_warehouse.Main",
+        "args": "port=8081"
+      },
+      {
+        "type": "java",
+        "name": "Launch DataWarehouse instance2",
+        "request": "launch",
+        "mainClass": "com.ivan.data_warehouse.Main",
+        "args": "port=8082"
+      },
+      {
+        "type": "java",
+        "name": "Launch DataWarehouse instance3",
+        "request": "launch",
+        "mainClass": "com.ivan.data_warehouse.Main",
+        "args": "port=8083"
+      },
+    ]
   }
 }
