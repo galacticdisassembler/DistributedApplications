@@ -7,5 +7,58 @@ Content-Type: application/json
 
 
 
-GET http://localhost:8081/articles?q=1&q=22
+POST  http://localhost:8081/articles?q=1&q=22
 Content-Type: application/xml
+
+<ArrayList>
+  <item>
+    <authorFullName>AuthorFN22</authorFullName>
+    <title>Hello</title>
+    <content>Content ...</content>
+    <category>category</category>
+  </item>
+    <item>
+    <authorFullName>AuthorFN33</authorFullName>
+    <title>Hello</title>
+    <content>Content ...</content>
+    <category>category</category>
+  </item>
+    <item>
+    <authorFullName>AuthorFN44</authorFullName>
+    <title>Hello</title>
+    <content>Content ...</content>
+    <category>category</category>
+  </item>
+</ArrayList>
+
+
+
+POST http://localhost:8081/articles
+Content-Type: application/json
+
+[
+  {
+    "authorFullName":"AuthorFN1",
+    "title":"Hello134134",
+    "content":"Content134134 ...",
+    "category":"category134"
+  },
+  {
+    "authorFullName":"AuthorFN2",
+    "title":"Hello",
+    "content":"Contentdafadfdaf ...",
+    "category":"categorydafadfaddaf"
+  },
+  {
+    "authorFullName":"AuthorFN3",
+    "title":"Hello",
+    "content":"Contentdafadfadfadf ...",
+    "category":"categoryadfadfadf"
+  },
+  {
+    "authorFullName":"AutdafadhorFN4",
+    "title":"Helloadfadfadf",
+    "content":"Contentadfadf ...",
+    "category":"categorydafad"
+  }
+]
