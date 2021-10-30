@@ -23,22 +23,25 @@ import java.util.StringJoiner;
 public class ArticlesAsyncServlet extends HttpServlet {
     private static final Logger logger = LogManager.getLogger(ArticlesAsyncServlet.class);
 
+    private static final String TEXT_PLAIN_RESPONSE_CONTENT_TYPE = "text/plain";
+
+    private final InternalSyncMechanism internalSyncMechanism;
+    private final ArticleDAO articleDao;
+
     public ArticlesAsyncServlet() {
         this.internalSyncMechanism = InternalSyncMechanism.getInstance();
         this.articleDao = ArticleDAO.getInstance();
     }
 
-    private final InternalSyncMechanism internalSyncMechanism;
-    private final ArticleDAO articleDao;
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        CustomAsyncWriteListener asyncRunner = null;;
         AsyncContext asyncContext = request.startAsync();
         ServletOutputStream out = response.getOutputStream();
         String contentType = request.getContentType();
+        CustomAsyncWriteListener asyncRunner =
+                buildCustomAsyncWriteListenerForErrorCase(asyncContext, response);
 
         ArticleModel model = new ArticleModel();
         List<ArticleModel> resultList = Arrays.asList(model);
@@ -65,7 +68,6 @@ public class ArticlesAsyncServlet extends HttpServlet {
                     internalSyncMechanism, response);
         } catch (Exception e) {
             logger.error(e);
-            asyncRunner = buildCustomAsyncWriteListenerForErrorCase(asyncContext, response);
 
         } finally {
             out.setWriteListener(asyncRunner);
@@ -75,55 +77,152 @@ public class ArticlesAsyncServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        AsyncContext asyncContext = request.startAsync();
+        CustomAsyncWriteListener asyncRunner =
+                buildCustomAsyncWriteListenerForErrorCase(asyncContext, response);
+        ServletOutputStream out = response.getOutputStream();
+        String contentType = request.getContentType();
+        String body = UtilsStaticMethods.getBody(request);
 
+        ArticleModel model = new ArticleModel();
+
+        if (contentType.equals("application/json")) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            model = objectMapper.readValue(body, ArticleModel.class);
+        }
+
+        if (contentType.equals("application/xml")) {
+            ObjectMapper objectMapper = new XmlMapper();
+            model = objectMapper.readValue(body, ArticleModel.class);
+        }
+
+        try {
+            internalSyncMechanism.getUsersCountIsServedNow().incrementAndGet();
+
+            boolean updatedWithSuccess = articleDao
+                    .update(model);
+
+            if (updatedWithSuccess) {
+                asyncRunner = new CustomAsyncWriteListener(
+                        TEXT_PLAIN_RESPONSE_CONTENT_TYPE, getServletContext(),
+                        asyncContext, "SUCCESS", HttpStatus.CREATED_201,
+                        internalSyncMechanism, response);
+            }
+
+        } catch (Exception e) {
+            logger.error(e);
+        } finally {
+            out.setWriteListener(asyncRunner);
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        AsyncContext asyncContext = request.startAsync();
         ServletOutputStream out = response.getOutputStream();
         String contentType = request.getContentType();
-
         String body = UtilsStaticMethods.getBody(request);
+        AsyncContext asyncContext = request.startAsync();
+        ArticleModel[] articles = new ArticleModel[] {};
+        CustomAsyncWriteListener asyncRunner =
+                buildCustomAsyncWriteListenerForErrorCase(asyncContext, response);
 
-        ArticleModel[] articles = null;
-        CustomAsyncWriteListener asyncRunner;
 
-        if (contentType.equals("application/json")) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            articles = objectMapper.readValue(body, ArticleModel[].class);
-        }
+        try {
+            internalSyncMechanism.getUsersCountIsServedNow().incrementAndGet();
 
-        if (contentType.equals("application/xml")) {
-            ObjectMapper objectMapper = new XmlMapper();
-            articles = objectMapper.readValue(body, ArticleModel[].class);
-        }
-
-        boolean insertedWithSuccess = articleDao.insert(articles);
-
-        if (insertedWithSuccess) {
-            StringJoiner joiner = new StringJoiner(",");
-            for (ArticleModel a : articles) {
-                joiner.add(a.getId().toString());
+            if (contentType.equals("application/json")) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                articles = objectMapper.readValue(body, ArticleModel[].class);
             }
 
-            asyncRunner = new CustomAsyncWriteListener(
-                    "text/plain", getServletContext(),
-                    asyncContext, joiner.toString(), HttpStatus.CREATED_201,
-                    internalSyncMechanism, response);
-        } else {
-            asyncRunner = buildCustomAsyncWriteListenerForErrorCase(asyncContext, response);
-        }
+            if (contentType.equals("application/xml")) {
+                ObjectMapper objectMapper = new XmlMapper();
+                articles = objectMapper.readValue(body, ArticleModel[].class);
+            }
 
-        out.setWriteListener(asyncRunner);
+            boolean insertedWithSuccess = articleDao.insert(articles);
+
+            if (insertedWithSuccess) {
+                StringJoiner joiner = new StringJoiner(",");
+                for (ArticleModel a : articles) {
+                    joiner.add(a.getId().toString());
+                }
+
+                asyncRunner = new CustomAsyncWriteListener(
+                        TEXT_PLAIN_RESPONSE_CONTENT_TYPE, getServletContext(),
+                        asyncContext, joiner.toString(), HttpStatus.CREATED_201,
+                        internalSyncMechanism, response);
+            }
+        } catch (Exception e) {
+            logger.error(e);
+        } finally {
+            out.setWriteListener(asyncRunner);
+        }
+    }
+
+    @Override
+    protected void doOptions(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        AsyncContext asyncContext = request.startAsync();
+        ServletOutputStream out = response.getOutputStream();
+        CustomAsyncWriteListener asyncRunner =
+                buildCustomAsyncWriteListenerForErrorCase(asyncContext, response);
+
+        try {
+            internalSyncMechanism.getUsersCountIsServedNow().incrementAndGet();
+
+            Map<String, String[]> params = UtilsStaticMethods.getQueryParameters(request);
+            int delayInMilliseconds = 0;
+
+            if (params.containsKey("delayInMilliseconds")) {
+                delayInMilliseconds = Integer.parseInt(params.get("delayInMilliseconds")[0]);
+            }
+
+            response.addHeader("Allow", "OPTIONS, GET, HEAD, POST, PUT, DELETE");
+
+            asyncRunner = new CustomAsyncWriteListener(
+                    TEXT_PLAIN_RESPONSE_CONTENT_TYPE, getServletContext(),
+                    asyncContext, "", HttpStatus.NO_CONTENT_204,
+                    internalSyncMechanism, response);
+
+            asyncRunner.setDevOnlyResponseDelayMilliseconds(delayInMilliseconds);
+        } catch (Exception e) {
+            logger.error(e);
+
+        } finally {
+            out.setWriteListener(asyncRunner);
+        }
+    }
+
+    @Override
+    protected void doHead(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        AsyncContext asyncContext = request.startAsync();
+        ServletOutputStream out = response.getOutputStream();
+        CustomAsyncWriteListener asyncRunner =
+                buildCustomAsyncWriteListenerForErrorCase(asyncContext, response);
+
+        try {
+            internalSyncMechanism.getUsersCountIsServedNow().incrementAndGet();
+
+            asyncRunner = new CustomAsyncWriteListener(
+                    TEXT_PLAIN_RESPONSE_CONTENT_TYPE, getServletContext(),
+                    asyncContext, "", HttpStatus.NO_CONTENT_204,
+                    internalSyncMechanism, response);
+        } catch (Exception e) {
+            logger.error(e);
+
+        } finally {
+            out.setWriteListener(asyncRunner);
+        }
     }
 
     private CustomAsyncWriteListener buildCustomAsyncWriteListenerForErrorCase(
             AsyncContext asyncContext, HttpServletResponse response) {
         return new CustomAsyncWriteListener(
-                "text/plain", getServletContext(),
+                TEXT_PLAIN_RESPONSE_CONTENT_TYPE, getServletContext(),
                 asyncContext, "Error :(", HttpStatus.EXPECTATION_FAILED_417,
                 internalSyncMechanism, response);
     }

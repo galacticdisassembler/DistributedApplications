@@ -30,9 +30,14 @@ public final class ArticleDAO {
             "SELECT "
                     + " id, authorFullName, title, content, category"
                     + " FROM TB_ARTICLE LIMIT ? OFFSET ?";
-    private static final String SELECT_BY_ID_QUERY = "SELECT "
-            + " id, authorFullName, title, content, category"
-            + " FROM TB_ARTICLE WHERE id=? LIMIT 1 OFFSET 0";
+    private static final String SELECT_BY_ID_QUERY =
+            "SELECT "
+                    + " id, authorFullName, title, content, category"
+                    + " FROM TB_ARTICLE WHERE id=? LIMIT 1 OFFSET 0";
+    private static final String UPDATE_QUERY =
+            "UPDATE TB_ARTICLE"
+                    + " SET authorFullName=?, title=?, content=?, category=? "
+                    + " WHERE id=? ";
 
     private AtomicInteger idIncrementor;
 
@@ -152,6 +157,39 @@ public final class ArticleDAO {
         }
 
         return result;
+    }
+
+    public boolean update(ArticleModel articleModel) {
+        try (PreparedStatement ps =
+                connection.prepareStatement(UPDATE_QUERY, Statement.RETURN_GENERATED_KEYS)) {
+            connection.setAutoCommit(false);
+
+            ps.setString(1, articleModel.getAuthorFullName());
+            ps.setString(2, articleModel.getTitle());
+            ps.setString(3, articleModel.getContent());
+            ps.setString(4, articleModel.getCategory());
+            ps.setInt(5, articleModel.getId());
+
+            int numRowsInserted = ps.executeUpdate();
+
+            if (numRowsInserted != 1) {
+                connection.rollback();
+                return false;
+            }
+
+            connection.commit();
+            return true;
+
+        } catch (SQLException e) {
+            logger.error(e);
+            return false;
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                logger.error(e);
+            }
+        }
     }
 
 }

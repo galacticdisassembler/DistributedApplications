@@ -62,3 +62,42 @@ Content-Type: application/json
     "category":"categorydafad"
   }
 ]
+
+
+GET http://localhost:8081/articles?offset=1&limit=5
+Content-Type: application/json
+
+GET http://localhost:8081/articles?id=11
+Content-Type: application/json
+
+
+GET http://localhost:8081/articles?offset=1&limit=5
+Content-Type: application/xml
+
+GET http://localhost:8081/articles?id=2
+Content-Type: application/xml
+
+PUT http://localhost:8081/articles
+Content-Type: application/json
+
+{
+  "id": 1,
+  "authorFullName":"ww",
+  "title":"ee",
+  "content":"rr ...",
+  "category":"tt"
+}
+
+PUT  http://localhost:8081/articles
+Content-Type: application/xml
+
+<item>
+  <id>2</id>
+  <authorFullName>q</authorFullName>
+  <title>w: </title>
+  <content>w:  ...</content>
+  <category>w</category>
+</item>
+
+
+OPTIONS http://localhost:8081/articles?delayInMilliseconds=3000
