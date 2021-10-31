@@ -15,9 +15,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.StringJoiner;
 
 public class ArticlesAsyncServlet extends HttpServlet {
@@ -53,7 +55,12 @@ public class ArticlesAsyncServlet extends HttpServlet {
 
             if (params.containsKey("id")) {
                 int id = Integer.parseInt(params.get("id")[0]);
-                resultList = Arrays.asList(articleDao.select(id));
+                Optional<ArticleModel> articleFromDb = articleDao.select(id);
+                if (articleFromDb.isPresent()) {
+                    resultList = Arrays.asList(articleFromDb.get());
+                } else {
+                    resultList = new ArrayList<>();
+                }
             }
 
             if (params.containsKey("limit") && params.containsKey("offset")) {
@@ -211,6 +218,33 @@ public class ArticlesAsyncServlet extends HttpServlet {
                     TEXT_PLAIN_RESPONSE_CONTENT_TYPE, getServletContext(),
                     asyncContext, "", HttpStatus.NO_CONTENT_204,
                     internalSyncMechanism, response);
+        } catch (Exception e) {
+            logger.error(e);
+
+        } finally {
+            out.setWriteListener(asyncRunner);
+        }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        AsyncContext asyncContext = request.startAsync();
+        ServletOutputStream out = response.getOutputStream();
+        CustomAsyncWriteListener asyncRunner =
+                buildCustomAsyncWriteListenerForErrorCase(asyncContext, response);
+        String body = UtilsStaticMethods.getBody(request);
+
+
+        try {
+            internalSyncMechanism.getUsersCountIsServedNow().incrementAndGet();
+            int id = Integer.parseInt(body);
+            if (articleDao.delete(id)) {
+                asyncRunner = new CustomAsyncWriteListener(
+                        TEXT_PLAIN_RESPONSE_CONTENT_TYPE, getServletContext(),
+                        asyncContext, "", HttpStatus.CREATED_201,
+                        internalSyncMechanism, response);
+            }
         } catch (Exception e) {
             logger.error(e);
 

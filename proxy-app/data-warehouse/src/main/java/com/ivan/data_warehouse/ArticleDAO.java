@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class ArticleDAO {
@@ -37,6 +38,9 @@ public final class ArticleDAO {
     private static final String UPDATE_QUERY =
             "UPDATE TB_ARTICLE"
                     + " SET authorFullName=?, title=?, content=?, category=? "
+                    + " WHERE id=? ";
+    private static final String DELETE_QUERY =
+            "DELETE FROM TB_ARTICLE"
                     + " WHERE id=? ";
 
     private AtomicInteger idIncrementor;
@@ -108,6 +112,34 @@ public final class ArticleDAO {
         }
     }
 
+    public boolean delete(int id) {
+        try (PreparedStatement ps =
+                connection.prepareStatement(DELETE_QUERY, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, id);
+            connection.setAutoCommit(false);
+
+            int numRowsChanged = ps.executeUpdate();
+
+            if (numRowsChanged != 1) {
+                connection.rollback();
+                return false;
+            }
+
+            connection.commit();
+            return true;
+
+        } catch (SQLException e) {
+            logger.error(e);
+            return false;
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                logger.error(e);
+            }
+        }
+    }
+
     public List<ArticleModel> select(int offset, int limit) {
         List<ArticleModel> result = new ArrayList<>(limit);
 
@@ -134,7 +166,7 @@ public final class ArticleDAO {
         return result;
     }
 
-    public ArticleModel select(int id) {
+    public Optional<ArticleModel> select(int id) {
         ArticleModel result = null;
 
         try (PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID_QUERY)) {
@@ -156,7 +188,7 @@ public final class ArticleDAO {
             logger.error(e);
         }
 
-        return result;
+        return Optional.ofNullable(result);
     }
 
     public boolean update(ArticleModel articleModel) {
