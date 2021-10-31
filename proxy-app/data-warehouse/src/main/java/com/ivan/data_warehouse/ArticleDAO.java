@@ -42,6 +42,7 @@ public final class ArticleDAO {
     private static final String DELETE_QUERY =
             "DELETE FROM TB_ARTICLE"
                     + " WHERE id=? ";
+    private static final String DELETE_ALL_QUERY = "DELETE FROM TB_ARTICLE";
 
     private AtomicInteger idIncrementor;
 
@@ -85,7 +86,55 @@ public final class ArticleDAO {
                 ps.setString(2, a.getTitle());
                 ps.setString(3, a.getContent());
                 ps.setString(4, a.getCategory());
-                ps.setInt(5, idIncrementor.incrementAndGet());
+
+                int id = idIncrementor.incrementAndGet();
+
+                ps.setInt(5, id);
+
+                int numRowsInserted = ps.executeUpdate();
+
+                if (numRowsInserted != 1) {
+                    connection.rollback();
+                    return false;
+                } else {
+                    a.setId(idIncrementor.get());
+                }
+            }
+
+            connection.commit();
+            return true;
+
+        } catch (SQLException e) {
+            logger.error(e);
+            return false;
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                logger.error(e);
+            }
+        }
+    }
+
+    public boolean cleanAndInsert(ArticleModel[] articles, int newIdSeqNumber) {
+        idIncrementor.set(newIdSeqNumber);
+
+        try (PreparedStatement ps =
+                connection.prepareStatement(INSERT_QUERY, Statement.RETURN_GENERATED_KEYS);
+                Statement st = connection.createStatement();) {
+            connection.setAutoCommit(false);
+
+            st.executeUpdate(DELETE_ALL_QUERY);
+
+            for (ArticleModel a : articles) {
+                ps.setString(1, a.getAuthorFullName());
+                ps.setString(2, a.getTitle());
+                ps.setString(3, a.getContent());
+                ps.setString(4, a.getCategory());
+
+                int id = a.getId();
+
+                ps.setInt(5, id);
 
                 int numRowsInserted = ps.executeUpdate();
 

@@ -1,9 +1,4 @@
-GET http://localhost:8080/service
-
-
-
-GET http://localhost:8081/articles?q=1&q=22
-Content-Type: application/json
+GET http://localhost:8081/service
 
 
 
@@ -33,7 +28,7 @@ Content-Type: application/xml
 
 
 
-POST http://localhost:8081/articles
+POST http://localhost:8082/articles
 Content-Type: application/json
 
 [
@@ -64,7 +59,11 @@ Content-Type: application/json
 ]
 
 
-GET http://localhost:8081/articles?offset=1&limit=5
+POST http://localhost:8082/service
+Target: http://localhost:8081
+Content-Type: application/json
+
+GET  http://localhost:8082/articles?offset=0&limit=15
 Content-Type: application/json
 
 GET http://localhost:8081/articles?id=2
@@ -103,4 +102,7 @@ Content-Type: application/xml
 </item>
 
 
-OPTIONS http://localhost:8081/articles?delayInMilliseconds=3000
+OPTIONS http://localhost:8081/articles?delayInMilliseconds=30000
+
+
+

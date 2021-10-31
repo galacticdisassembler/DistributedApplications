@@ -45,8 +45,7 @@ public class ArticlesAsyncServlet extends HttpServlet {
         CustomAsyncWriteListener asyncRunner =
                 buildCustomAsyncWriteListenerForErrorCase(asyncContext, response);
 
-        ArticleModel model = new ArticleModel();
-        List<ArticleModel> resultList = Arrays.asList(model);
+        List<ArticleModel> resultList = new ArrayList<>();
 
         try {
             internalSyncMechanism.getUsersCountIsServedNow().incrementAndGet();
@@ -61,9 +60,7 @@ public class ArticlesAsyncServlet extends HttpServlet {
                 } else {
                     resultList = new ArrayList<>();
                 }
-            }
-
-            if (params.containsKey("limit") && params.containsKey("offset")) {
+            } else if (params.containsKey("limit") && params.containsKey("offset")) {
                 int limit = Integer.parseInt(params.get("limit")[0]);
                 int offset = Integer.parseInt(params.get("offset")[0]);
                 resultList = articleDao.select(offset, limit);
@@ -93,18 +90,18 @@ public class ArticlesAsyncServlet extends HttpServlet {
 
         ArticleModel model = new ArticleModel();
 
-        if (contentType.equals("application/json")) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            model = objectMapper.readValue(body, ArticleModel.class);
-        }
-
-        if (contentType.equals("application/xml")) {
-            ObjectMapper objectMapper = new XmlMapper();
-            model = objectMapper.readValue(body, ArticleModel.class);
-        }
-
         try {
             internalSyncMechanism.getUsersCountIsServedNow().incrementAndGet();
+
+            if (contentType.equals("application/json")) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                model = objectMapper.readValue(body, ArticleModel.class);
+            }
+
+            if (contentType.equals("application/xml")) {
+                ObjectMapper objectMapper = new XmlMapper();
+                model = objectMapper.readValue(body, ArticleModel.class);
+            }
 
             boolean updatedWithSuccess = articleDao
                     .update(model);
