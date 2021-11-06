@@ -1,4 +1,4 @@
-package com.ivan.common;
+package com.ivan.sync_service;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;

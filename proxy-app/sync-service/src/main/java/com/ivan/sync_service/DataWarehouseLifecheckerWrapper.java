@@ -1,6 +1,5 @@
 package com.ivan.sync_service;
 
-import com.ivan.common.DataWarehouseLifechecker;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
