@@ -3,10 +3,8 @@ GET http://localhost:8081/service
 
 
 GET http://localhost:8080/sync?newHost=http://localhost:8081
-
-
-
 GET http://localhost:8080/sync?sync=1&origin=http://localhost:8081
+GET http://localhost:8080/sync?getAllDWs=1
 
 
 
@@ -36,7 +34,7 @@ Content-Type: application/xml
 
 
 
-POST http://localhost:8081/articles
+POST http://localhost:8090/api
 Content-Type: application/json
 
 [
@@ -71,28 +69,28 @@ POST http://localhost:8082/service
 Target: http://localhost:8081
 Content-Type: application/json
 
-GET  http://localhost:8082/articles?offset=0&limit=15
-Content-Type: application/json
+GET  http://localhost:8081/articles?offset=0&limit=15
+Content-Type: application/xml
 
-GET http://localhost:8081/articles?id=10
+GET http://localhost:8081/articless?id=1
 Content-Type: application/xml
 
 DELETE http://localhost:8081/articles
 
 2
 
-GET http://localhost:8081/articles?offset=1&limit=5
+GET http://localhost:8081/articles?offset=0&limit=5
 Content-Type: application/xml
 
-GET http://localhost:8081/articles?id=2
+GET http://localhost:8081/articles?id=1
 Content-Type: application/xml
 
 PUT http://localhost:8081/articles
 Content-Type: application/json
 
 {
-  "id": 10,
-  "authorFullName":"ZZ",
+  "id": 1,
+  "authorFullName":"UPDATEDZZ",
   "title":"ee",
   "content":"rr ...",
   "category":"tt"
@@ -102,8 +100,8 @@ PUT  http://localhost:8081/articles
 Content-Type: application/xml
 
 <item>
-  <id>2</id>
-  <authorFullName>q</authorFullName>
+  <id>1</id>
+  <authorFullName>QQQQQQ</authorFullName>
   <title>w: </title>
   <content>w:  ...</content>
   <category>w</category>
@@ -113,4 +111,88 @@ Content-Type: application/xml
 OPTIONS http://localhost:8081/articles?delayInMilliseconds=30000
 
 
+
+
+
+
+
+
+
+
+
+
+POST  http://localhost:8090/api
+Content-Type: application/xml
+
+<ArrayList>
+  <item>
+    <authorFullName>ZZZZZZZZAuthorFN22</authorFullName>
+    <title>Hello</title>
+    <content>Content ...</content>
+    <category>category</category>
+  </item>
+    <item>
+    <authorFullName>AuthorFN33</authorFullName>
+    <title>Hello</title>
+    <content>Content ...</content>
+    <category>category</category>
+  </item>
+    <item>
+    <authorFullName>AuthorFN44</authorFullName>
+    <title>Hello</title>
+    <content>Content ...</content>
+    <category>category</category>
+  </item>
+</ArrayList>
+
+
+
+POST http://localhost:8090/api
+Content-Type: application/json
+
+[
+  {
+    "authorFullName":"AuthorFN1",
+    "title":"Hello134134",
+    "content":"Content134134 ...",
+    "category":"category134"
+  },
+  {
+    "authorFullName":"AuthorFN2",
+    "title":"Hello",
+    "content":"Contentdafadfdaf ...",
+    "category":"categorydafadfaddaf"
+  },
+  {
+    "authorFullName":"AuthorFN3",
+    "title":"Hello",
+    "content":"Contentdafadfadfadf ...",
+    "category":"categoryadfadfadf"
+  },
+  {
+    "authorFullName":"AutdafadhorFN4",
+    "title":"Helloadfadfadf",
+    "content":"Contentadfadf ...",
+    "category":"categorydafad"
+  }
+]
+
+
+GET  http://localhost:8090/api?offset=0&limit=2
+Content-Type: application/json
+
+GET  http://localhost:8090/api?id=1
+Content-Type: application/json
+
+
+PUT  http://localhost:8090/api
+Content-Type: application/json
+
+{
+  "id": 1,
+  "authorFullName":"ZZ",
+  "title":"ee",
+  "content":"rr ...",
+  "category":"tt"
+}
 

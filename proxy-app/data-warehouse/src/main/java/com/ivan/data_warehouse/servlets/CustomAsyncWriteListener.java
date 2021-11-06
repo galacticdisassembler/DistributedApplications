@@ -101,6 +101,9 @@ public class CustomAsyncWriteListener implements WriteListener {
             beforeWriteCallback.run();
             writeStringToOutputStream(outputStream, respString);
             afterWriteCallback.run();
+
+            internalSyncMechanism.getUsersCountIsServedNow().decrementAndGet();
+
         } catch (Exception e) {
             response.setStatus(400);
             logger.error(e);
@@ -128,9 +131,6 @@ public class CustomAsyncWriteListener implements WriteListener {
 
                 response.setStatus(responseStatus);
                 asyncContext.complete();
-                internalSyncMechanism
-                        .getUsersCountIsServedNow()
-                        .decrementAndGet();
 
                 return;
             }

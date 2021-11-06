@@ -1,6 +1,6 @@
 require('isomorphic-fetch');
 
-const RPM = 5000
+const RPM = 50
 let rpmCounter = RPM
 
 setInterval(async () => {
@@ -8,7 +8,10 @@ setInterval(async () => {
  
   for(let i=0; i<RPM; i++){
     try{
-      const response = await fetch('http://localhost:8080/api')
+      const response = await fetch('http://localhost:8081/articles?delayInMilliseconds=1000',
+      {
+        method: "OPTIONS"
+      })
       const data = await response.text()
       console.log(data)
       rpmCounter++

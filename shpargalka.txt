@@ -1,0 +1,26 @@
+
+
+
+1) Sync serv
+  a) Posibilitatea de a conecta si mentine sincronizat multe WHs
+  b) Daca cade un WHs, la ridicare el se sincronizeaza cu 
+  c) In lista syncronizata(thread safe) mentine toate conexiunile cu WHs
+  d) Realtime (long pooling) controleaza starea de viata a DWs 
+
+2)Data Warehouse:
+  a) Baza de date relationala in memory sqlite (fiecare DWs are baza sa ) 
+  b) GET, PUT, POST, DELETE, HEAD, OPTIONS(pentru test se poate de setat delay)
+  c) Toate http cererile se proceseaza asincron
+  d) Monitorizare interna a nr. de utilizatori ce se proceseaza la moment(necesar pentur proxy)
+  e) XML si JSON acceptare si returnare
+  f) La rulare face connect cu SyncService (chestii de sincronizare mult de explic Ivan)
+
+3) Proxy
+  a) Get, put, post
+  b) Lista cu DWs extrage din SyncService, 
+  c) Monitorizarea incarcarii DWsului are loc long pooling 0.5s extragerea starii DWsului
+  d) Structuri de date thread safe
+  e) IMPORTANT!!! Cache :D insert on update and getbyid, extract on getById 
+
+evaluare proiect - echipa
+indiv = indiv

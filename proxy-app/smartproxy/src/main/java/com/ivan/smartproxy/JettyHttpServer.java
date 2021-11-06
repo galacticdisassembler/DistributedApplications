@@ -1,7 +1,6 @@
-package com.ivan.data_warehouse;
+package com.ivan.smartproxy;
 
-import com.ivan.data_warehouse.servlets.ArticlesAsyncServlet;
-import com.ivan.data_warehouse.servlets.ServiceMechanismServlet;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.server.Connector;
@@ -13,12 +12,10 @@ public class JettyHttpServer {
 
     private static final Logger logger = LogManager.getLogger(JettyHttpServer.class);
 
-    private final SyncServiceConnector syncServiceConnector = SyncServiceConnector.getInstance();
-
     private Server server;
 
     public void start(int port, String syncServiceHost) throws Exception {
-
+        Static.syncServiceHost = syncServiceHost;
 
         server = new Server();
         ServerConnector connector = new ServerConnector(server);
@@ -26,28 +23,12 @@ public class JettyHttpServer {
         server.setConnectors(new Connector[] {connector});
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
-        context.addServlet(ArticlesAsyncServlet.class, "/articles");
-        context.addServlet(ServiceMechanismServlet.class, "/service");
+        context.addServlet(ApiServlet.class, "/api");
         server.setHandler(context);
         logger.info("App is running on port: {}", port);
         server.start();
 
-        new Thread(() -> {
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-            }
-
-            if (!syncServiceConnector
-                    .connectToSyncService(syncServiceHost,
-                            "http://localhost:" + Integer.toString(port))) {
-                logger.error("Can\'t connect to SyncService!!!");
-                System.exit(-1);
-            } else {
-                logger.info("Successfull connect to SyncService");
-            }
-
-        }).run();
+        Static.SYNC_SERVICE_CONNECTOR_WRAPPER.run();
 
         server.join();
 

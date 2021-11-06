@@ -60,28 +60,28 @@ public class DataWarehouseLifechecker {
                     boolean removed = false;
 
                     if (!p.getValue0().isDone() || p.getValue0().isCancelled()) {
-                        dataWarehouses.remove(p.getValue1());
                         removed = true;
                     } else {
                         try {
                             if (!p.getValue0().get()) {
-                                dataWarehouses.remove(p.getValue1());
                                 removed = true;
                             }
                         } catch (InterruptedException | ExecutionException e) {
-                            dataWarehouses.remove(p.getValue1());
                             removed = true;
                             logger.error(e);
                         }
                     }
 
-                    if (removed) {
+                    if (removed && !DataWarehouseLifecheckerWrapper.connectedNewDW) {
+                        dataWarehouses.remove(p.getValue1());
+
                         logger.info(String.format("DW host from SyncService %s removed",
                                 p.getValue1()));
                     } else {
                         synchronizedDataWarehouses.add(p.getValue1());
                     }
 
+                    DataWarehouseLifecheckerWrapper.connectedNewDW = false;
                 }
 
                 logger.info("Synchronized DW\'s: {}", synchronizedDataWarehouses);
@@ -93,11 +93,12 @@ public class DataWarehouseLifechecker {
 
     private boolean dataWarehouseIsAlive(String dwHost) {
 
-        int timeoutImMillis = 700;
+        int timeoutImMillis = 900;
         RequestConfig config = RequestConfig.custom()
                 .setConnectTimeout(timeoutImMillis)
                 .setConnectionRequestTimeout(timeoutImMillis)
-                .setSocketTimeout(timeoutImMillis).build();
+                .setSocketTimeout(timeoutImMillis)
+                .build();
 
 
         try (CloseableHttpClient httpClient =

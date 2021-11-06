@@ -41,6 +41,8 @@ public class SyncServlet extends HttpServlet {
 
             logger.info("Connected new DW with host: {}", connectedHost);
 
+            DataWarehouseLifecheckerWrapper.connectedNewDW = true;
+
             if (differentHostExists) {
                 responseBody = hosts.iterator().next();
             } else {
@@ -59,6 +61,14 @@ public class SyncServlet extends HttpServlet {
             }
 
             logger.info("Sync SUCCESS DWs: {}", stringJoiner.toString());
+
+            responseBody = stringJoiner.toString();
+        } else if (params.containsKey("getAllDWs")) {
+
+            StringJoiner stringJoiner = new StringJoiner(";");
+            for (String s : hosts) {
+                stringJoiner.add(s);
+            }
 
             responseBody = stringJoiner.toString();
         }

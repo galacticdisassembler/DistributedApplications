@@ -33,7 +33,6 @@ public class ServiceMechanismServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        internalSyncMechanism.getUsersCountIsServedNow().incrementAndGet();
 
         try (PrintWriter pw = response.getWriter();) {
 
@@ -57,7 +56,6 @@ public class ServiceMechanismServlet extends HttpServlet {
 
         try (PrintWriter printWriter = response.getWriter();
                 CloseableHttpClient httpClient = HttpClients.createDefault();) {
-            internalSyncMechanism.getUsersCountIsServedNow().incrementAndGet();
 
             HttpGet req = new HttpGet(target + "/articles?offset=0&limit=9999");
             req.setHeader("Content-Type", "application/json");
@@ -88,8 +86,6 @@ public class ServiceMechanismServlet extends HttpServlet {
 
         } catch (Exception e) {
             logger.error(e);
-        } finally {
-            internalSyncMechanism.getUsersCountIsServedNow().decrementAndGet();
         }
     }
 

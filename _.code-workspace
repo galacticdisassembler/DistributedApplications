@@ -172,6 +172,14 @@
       },
       {
         "type": "java",
+        "name": "ProxySmart",
+        "request": "launch",
+        "mainClass": "com.ivan.smartproxy.Main",
+        "args": ["port=8090", "syncServiceHost=http://localhost:8080"],
+        "console": "externalTerminal",
+      },
+      {
+        "type": "java",
         "name": "DW node_1",
         "request": "launch",
         "mainClass": "com.ivan.data_warehouse.Main",

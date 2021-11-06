@@ -59,6 +59,7 @@ public class SyncServiceConnector {
 
                     if (result.startsWith("http:")) {
                         boolean resultVal = syncWithDWService(result);
+
                         return resultVal;
                     }
                 }
