@@ -2,9 +2,11 @@ package com.ivan.data_warehouse.servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.ivan.common.UtilsStaticMethods;
 import com.ivan.common.models.ArticleModel;
 import com.ivan.data_warehouse.ArticleDAO;
 import com.ivan.data_warehouse.InternalSyncMechanism;
+import com.ivan.data_warehouse.SyncServiceConnector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.http.HttpStatus;
@@ -29,10 +31,12 @@ public class ArticlesAsyncServlet extends HttpServlet {
 
     private final InternalSyncMechanism internalSyncMechanism;
     private final ArticleDAO articleDao;
+    private final SyncServiceConnector syncServiceConnector;
 
     public ArticlesAsyncServlet() {
         this.internalSyncMechanism = InternalSyncMechanism.getInstance();
         this.articleDao = ArticleDAO.getInstance();
+        this.syncServiceConnector = SyncServiceConnector.getInstance();
     }
 
     @Override
@@ -107,6 +111,8 @@ public class ArticlesAsyncServlet extends HttpServlet {
                     .update(model);
 
             if (updatedWithSuccess) {
+
+                syncServiceConnector.syncAllDWsWithMe();
                 asyncRunner = new CustomAsyncWriteListener(
                         TEXT_PLAIN_RESPONSE_CONTENT_TYPE, getServletContext(),
                         asyncContext, "SUCCESS", HttpStatus.CREATED_201,
@@ -154,6 +160,7 @@ public class ArticlesAsyncServlet extends HttpServlet {
                     joiner.add(a.getId().toString());
                 }
 
+                syncServiceConnector.syncAllDWsWithMe();
                 asyncRunner = new CustomAsyncWriteListener(
                         TEXT_PLAIN_RESPONSE_CONTENT_TYPE, getServletContext(),
                         asyncContext, joiner.toString(), HttpStatus.CREATED_201,

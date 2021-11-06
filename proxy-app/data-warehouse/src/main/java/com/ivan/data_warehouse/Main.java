@@ -24,8 +24,10 @@ public class Main {
         logger.info("Args: {}", stringJoiner.toString());
 
         int port = Integer.parseInt(argsVariablesWithValues.getOrDefault("port", "8080"));
+        String syncServiceHost = argsVariablesWithValues.get("syncServiceHost");
+
         try {
-            server.start(port);
+            server.start(port, syncServiceHost);
         } catch (Exception e) {
             logger.error(e);
         }

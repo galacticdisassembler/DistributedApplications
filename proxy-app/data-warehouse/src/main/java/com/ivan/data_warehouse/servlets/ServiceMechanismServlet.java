@@ -12,24 +12,19 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class ServiceMechanismServlet extends HttpServlet {
 
-    private InternalSyncMechanism internalSyncMechanism = InternalSyncMechanism.getInstance();
     private static final Logger logger = LogManager.getLogger(ServiceMechanismServlet.class);
 
+    private final InternalSyncMechanism internalSyncMechanism = InternalSyncMechanism.getInstance();
     private final ArticleDAO articleDao = ArticleDAO.getInstance();
 
     private String getCurrentUsers() {
@@ -40,33 +35,14 @@ public class ServiceMechanismServlet extends HttpServlet {
             throws ServletException, IOException {
         internalSyncMechanism.getUsersCountIsServedNow().incrementAndGet();
 
-        AsyncContext async = request.startAsync();
-        ServletOutputStream out = response.getOutputStream();
+        try (PrintWriter pw = response.getWriter();) {
 
-        out.setWriteListener(new WriteListener() {
-            @Override
-            public void onWritePossible() throws IOException {
-                while (out.isReady()) {
-                    ByteBuffer content =
-                            ByteBuffer.wrap(getCurrentUsers().getBytes(StandardCharsets.UTF_8));
+            response.setStatus(200);
+            pw.print(getCurrentUsers());
 
-                    if (!content.hasRemaining()) {
-                        response.setStatus(200);
-                        async.complete();
-                        internalSyncMechanism.getUsersCountIsServedNow().decrementAndGet();
-                        return;
-                    }
-                    out.write(content.get());
-                }
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                getServletContext().log("Async Error", t);
-                async.complete();
-                internalSyncMechanism.getUsersCountIsServedNow().decrementAndGet();
-            }
-        });
+        } catch (Exception e) {
+            logger.error(e);
+        }
     }
 
     /**

@@ -17,4 +17,6 @@ public class InternalSyncMechanism {
     public AtomicInteger getUsersCountIsServedNow() {
         return usersCountIsServedNow;
     }
+
+
 }

@@ -21,11 +21,13 @@ public class JettyHttpServer {
         server.setConnectors(new Connector[] {connector});
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
-        // context.addServlet(ArticlesAsyncServlet.class, "/articles");
-        // context.addServlet(ServiceMechanismServlet.class, "/service");
+        context.addServlet(SyncServlet.class, "/sync");
         server.setHandler(context);
         logger.info("App is running on port: {}", port);
         server.start();
+
+        DataWarehouseLifecheckerWrapper.INSTANCE.run();
+
         server.join();
 
     }

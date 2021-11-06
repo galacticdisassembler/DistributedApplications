@@ -164,24 +164,36 @@
     "configurations": [
       {
         "type": "java",
-        "name": "Launch DataWarehouse instance1",
+        "name": "SyncService",
         "request": "launch",
-        "mainClass": "com.ivan.data_warehouse.Main",
-        "args": "port=8081"
+        "mainClass": "com.ivan.sync_service.Main",
+        "args": ["port=8080"],
+        "console": "externalTerminal",
       },
       {
         "type": "java",
-        "name": "Launch DataWarehouse instance2",
+        "name": "DW node_1",
         "request": "launch",
         "mainClass": "com.ivan.data_warehouse.Main",
-        "args": "port=8082"
+        "args": ["port=8081", "syncServiceHost=http://localhost:8080"],
+        "console": "externalTerminal",
+        
       },
       {
         "type": "java",
-        "name": "Launch DataWarehouse instance3",
+        "name": "DW node_2",
         "request": "launch",
         "mainClass": "com.ivan.data_warehouse.Main",
-        "args": "port=8083"
+        "args": "port=8082 syncServiceHost=http://localhost:8080",
+        "console": "externalTerminal",
+      },
+      {
+        "type": "java",
+        "name": "DW node_3",
+        "request": "launch",
+        "mainClass": "com.ivan.data_warehouse.Main",
+        "args": "port=8083 syncServiceHost=http://localhost:8080",
+        "console": "externalTerminal",
       },
     ]
   }

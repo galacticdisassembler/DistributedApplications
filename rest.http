@@ -2,12 +2,20 @@ GET http://localhost:8081/service
 
 
 
-POST  http://localhost:8081/articles?q=1&q=22
+GET http://localhost:8080/sync?newHost=http://localhost:8081
+
+
+
+GET http://localhost:8080/sync?sync=1&origin=http://localhost:8081
+
+
+
+POST  http://localhost:8081/articles
 Content-Type: application/xml
 
 <ArrayList>
   <item>
-    <authorFullName>AuthorFN22</authorFullName>
+    <authorFullName>ZZZZZZZZAuthorFN22</authorFullName>
     <title>Hello</title>
     <content>Content ...</content>
     <category>category</category>
@@ -28,7 +36,7 @@ Content-Type: application/xml
 
 
 
-POST http://localhost:8082/articles
+POST http://localhost:8081/articles
 Content-Type: application/json
 
 [
@@ -66,8 +74,8 @@ Content-Type: application/json
 GET  http://localhost:8082/articles?offset=0&limit=15
 Content-Type: application/json
 
-GET http://localhost:8081/articles?id=2
-Content-Type: application/json
+GET http://localhost:8081/articles?id=10
+Content-Type: application/xml
 
 DELETE http://localhost:8081/articles
 
@@ -83,8 +91,8 @@ PUT http://localhost:8081/articles
 Content-Type: application/json
 
 {
-  "id": 1,
-  "authorFullName":"ww",
+  "id": 10,
+  "authorFullName":"ZZ",
   "title":"ee",
   "content":"rr ...",
   "category":"tt"

@@ -13,9 +13,18 @@ public class JettyHttpServer {
 
     private static final Logger logger = LogManager.getLogger(JettyHttpServer.class);
 
+    private final SyncServiceConnector syncServiceConnector = SyncServiceConnector.getInstance();
+
     private Server server;
 
-    public void start(int port) throws Exception {
+    public void start(int port, String syncServiceHost) throws Exception {
+        if (!syncServiceConnector
+                .connectToSyncService(syncServiceHost,
+                        "http://localhost:" + Integer.toString(port))) {
+            logger.error("Can\'t connect to SyncService!!!");
+            System.exit(-1);
+        }
+
         server = new Server();
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(port);

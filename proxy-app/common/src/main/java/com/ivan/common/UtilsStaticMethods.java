@@ -1,4 +1,4 @@
-package com.ivan.data_warehouse.servlets;
+package com.ivan.common;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
