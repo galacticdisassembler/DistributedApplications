@@ -8,7 +8,7 @@ GET http://localhost:8080/sync?getAllDWs=1
 
 
 
-POST  http://localhost:8081/articles
+POST  http://localhost:8088/articles
 Content-Type: application/xml
 
 <ArrayList>
@@ -31,6 +31,17 @@ Content-Type: application/xml
     <category>category</category>
   </item>
 </ArrayList>
+
+PUT http://localhost:8088/articles
+Content-Type: application/json
+
+{
+  "id": 1,
+  "authorFullName":"UPDATEDZZ",
+  "title":"ee",
+  "content":"rr ...",
+  "category":"tt"
+}
 
 
 
@@ -69,7 +80,7 @@ POST http://localhost:8082/service
 Target: http://localhost:8081
 Content-Type: application/json
 
-GET  http://localhost:8081/articles?offset=0&limit=15
+GET  http://localhost:8088/articles?offset=0&limit=15
 Content-Type: application/xml
 
 GET http://localhost:8081/articless?id=1
@@ -96,7 +107,7 @@ Content-Type: application/json
   "category":"tt"
 }
 
-PUT  http://localhost:8081/articles
+PUT  http://localhost:8088/articles
 Content-Type: application/xml
 
 <item>

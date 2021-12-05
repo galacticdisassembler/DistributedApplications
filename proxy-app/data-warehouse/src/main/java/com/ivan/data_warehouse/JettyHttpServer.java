@@ -32,22 +32,22 @@ public class JettyHttpServer {
         logger.info("App is running on port: {}", port);
         server.start();
 
-        new Thread(() -> {
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-            }
+        // new Thread(() -> {
+        //     try {
+        //         Thread.sleep(2000);
+        //     } catch (InterruptedException e) {
+        //     }
 
-            if (!syncServiceConnector
-                    .connectToSyncService(syncServiceHost,
-                            "http://localhost:" + Integer.toString(port))) {
-                logger.error("Can\'t connect to SyncService!!!");
-                System.exit(-1);
-            } else {
-                logger.info("Successfull connect to SyncService");
-            }
+        //     if (!syncServiceConnector
+        //             .connectToSyncService(syncServiceHost,
+        //                     "http://localhost:" + Integer.toString(port))) {
+        //         logger.error("Can\'t connect to SyncService!!!");
+        //         System.exit(-1);
+        //     } else {
+        //         logger.info("Successfull connect to SyncService");
+        //     }
 
-        }).run();
+        // }).run();
 
         server.join();
 
