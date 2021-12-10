@@ -18,4 +18,6 @@ jobs:
         distribution: 'adopt'
         cache: maven
     - name: Build with Maven
-      run: ./mvnw -f ./proxy-app/pom.xml package -Dmaven.test.skip
+      run: |
+        chmod +x ./mvnw
+        ./mvnw -f ./proxy-app/pom.xml package -Dmaven.test.skip
