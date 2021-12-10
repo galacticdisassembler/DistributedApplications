@@ -1,14 +1,18 @@
 name: Java CI with Maven
 
 on:
-  push:
+  pull_request:
     branches: [ master ]
 
 jobs:
-  build:
-
+  format:
     runs-on: ubuntu-latest
+    steps:
+    - name: Google Java Format
+      uses: axel-op/googlejavaformat-action@3.5.0
 
+  build:
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 11
@@ -21,3 +25,8 @@ jobs:
       run: |
         chmod +x ./mvnw
         ./mvnw -f ./proxy-app/pom.xml package -Dmaven.test.skip
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - run: ./mvnw -f ./proxy-app/pom.xml test
