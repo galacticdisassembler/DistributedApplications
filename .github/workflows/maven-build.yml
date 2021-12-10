@@ -29,4 +29,5 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - run: ./mvnw -f ./proxy-app/pom.xml test
+    - run: |
+        ./mvnw -f ./proxy-app/pom.xml test
