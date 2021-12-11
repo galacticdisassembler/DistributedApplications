@@ -1,0 +1,31 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout GitHub Action"
+        uses: actions/checkout@main
+
+      - name: "Login via Azure CLI"
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          # enable-AzPSSession: true
+
+      - name: "Build and push image"
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - run: |
+          docker build . --file Dockerfile --tag ${{ secrets.REGISTRY_NAME}}/maven-web-app:${{ github.sha }} --tag ${{ secrets.REGISTRY_NAME}}/maven-web-app:latest 
+          docker push ${{ secrets.REGISTRY_NAME}}/maven-web-app --all-tags
+      - run: az webapp restart --name cool-webapp --resource-group lab3-pad
