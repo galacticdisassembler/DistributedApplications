@@ -26,6 +26,6 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - run: |
-          docker build . --file Dockerfile --tag ${{ secrets.REGISTRY_NAME }}/maven-web-app:${{ github.sha }} --tag ${{ secrets.REGISTRY_NAME }}/maven-web-app:latest 
+          docker build . --tag ${{ secrets.REGISTRY_NAME }}/maven-web-app:${{ github.sha }} --tag ${{ secrets.REGISTRY_NAME }}/maven-web-app:latest 
           docker push ${{ secrets.REGISTRY_NAME }}/maven-web-app --all-tags
       - run: az webapp restart --name cool-webapp --resource-group lab3-pad
